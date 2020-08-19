@@ -174,12 +174,12 @@ module.exports = function main() {
       }
       mainWindow.focus();
     }
-  });
 
-  if (process.platform === 'win32') {
-    // Keep only command line / deep linked arguments
-    mainWindow.webContents.send('wpLogin', process.argv.slice(1));
-  }
+    if (process.platform === 'win32') {
+      // Keep only command line / deep linked arguments
+      mainWindow.webContents.send('wpLogin', process.argv.slice(1));
+    }
+  });
 
   if (!gotTheLock) {
     return app.quit();
