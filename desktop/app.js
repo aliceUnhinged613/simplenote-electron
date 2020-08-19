@@ -30,8 +30,13 @@ module.exports = function main() {
   app.on('will-finish-launching', function () {
     setTimeout(updater.ping.bind(updater), config.updater.delay);
     app.on('open-url', function (event, url) {
+      let deeplinkingUrl = url;
       event.preventDefault();
-      mainWindow.webContents.send('wpLogin', url);
+      if (process.platform === 'win32') {
+        // Keep only command line / deep linked arguments
+        deeplinkingUrl = process.argv.slice(1);
+      }
+      mainWindow.webContents.send('wpLogin', deeplinkingUrl);
     });
   });
 
