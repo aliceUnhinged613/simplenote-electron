@@ -27,14 +27,6 @@ module.exports = function main() {
   // be closed automatically when the JavaScript object is GCed.
   let mainWindow = null;
 
-  app.on('will-finish-launching', function () {
-    setTimeout(updater.ping.bind(updater), config.updater.delay);
-    app.on('open-url', function (event, url) {
-      event.preventDefault();
-      mainWindow.webContents.send('wpLogin', url);
-    });
-  });
-
   const url =
     isDev && process.env.DEV_SERVER
       ? 'http://localhost:4000' // TODO: find a solution to use host and port based on make config.
@@ -67,6 +59,14 @@ module.exports = function main() {
         nodeIntegration: false,
         preload: path.join(__dirname, './preload.js'),
       },
+    });
+
+    app.on('will-finish-launching', function () {
+      setTimeout(updater.ping.bind(updater), config.updater.delay);
+      app.on('open-url', function (event, url) {
+        event.preventDefault();
+        mainWindow.webContents.send('wpLogin', url);
+      });
     });
 
     // and load the index of the app.
