@@ -9,6 +9,7 @@ const {
   session,
 } = require('electron');
 
+const log = require('./logger');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 
@@ -36,6 +37,7 @@ module.exports = function main() {
         // Keep only command line / deep linked arguments
         deeplinkingUrl = process.argv.slice(1);
       }
+      log('desktop:deeplinking').info('Deep Link Url', deeplinkingUrl);
       mainWindow.webContents.send('wpLogin', deeplinkingUrl);
     });
   });
