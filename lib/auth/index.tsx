@@ -344,6 +344,7 @@ export class Auth extends Component<Props> {
     window.electron.send('wpLogin', authUrl);
 
     window.electron.receive('wpLogin', (url) => {
+      debugger;
       const { searchParams } = new URL(url);
 
       const errorCode = searchParams.get('error')
