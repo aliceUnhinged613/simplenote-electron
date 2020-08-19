@@ -61,14 +61,6 @@ module.exports = function main() {
       },
     });
 
-    app.on('will-finish-launching', function () {
-      setTimeout(updater.ping.bind(updater), config.updater.delay);
-      app.on('open-url', function (event, url) {
-        event.preventDefault();
-        mainWindow.webContents.send('wpLogin', url);
-      });
-    });
-
     // and load the index of the app.
     if (typeof mainWindow.loadURL === 'function') {
       mainWindow.loadURL(url);
@@ -166,7 +158,15 @@ module.exports = function main() {
 
   const gotTheLock = app.requestSingleInstanceLock();
 
-  app.on('second-instance', () => {
+  app.on('will-finish-launching', function () {
+    setTimeout(updater.ping.bind(updater), config.updater.delay);
+    app.on('open-url', function (event, url) {
+      event.preventDefault();
+      mainWindow.webContents.send('wpLogin', url);
+    });
+  });
+
+  app.on('second-instance', (e, argv) => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
       if (mainWindow.isMinimized()) {
@@ -177,7 +177,7 @@ module.exports = function main() {
 
     if (process.platform === 'win32') {
       // Keep only command line / deep linked arguments
-      mainWindow.webContents.send('wpLogin', process.argv.slice(1));
+      mainWindow.webContents.send('wpLogin', argv.slice(1));
     }
   });
 
