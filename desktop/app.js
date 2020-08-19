@@ -9,6 +9,7 @@ const {
   session,
 } = require('electron');
 
+const log = require('./logger')('desktop:wplogin');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 
@@ -168,10 +169,13 @@ module.exports = function main() {
   if (gotTheLock) {
     app.on('second-instance', (e, argv) => {
       // Someone tried to run a second instance, we should focus our window.
-
+      log.info('second-instance');
+      log.info('e', e);
+      log.info('argv', argv);
       // Protocol handler for win32
       // argv: An array of the second instance’s (command line / deep linked) arguments
       if (process.platform !== 'darwin') {
+        log.info('inside not osx check');
         // Keep only command line / deep linked arguments
         mainWindow.webContents.send('wpLogin', argv.slice(1));
       }
