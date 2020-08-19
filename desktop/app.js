@@ -9,7 +9,6 @@ const {
   session,
 } = require('electron');
 
-const log = require('./logger');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 
@@ -31,14 +30,8 @@ module.exports = function main() {
   app.on('will-finish-launching', function () {
     setTimeout(updater.ping.bind(updater), config.updater.delay);
     app.on('open-url', function (event, url) {
-      let deeplinkingUrl = url;
       event.preventDefault();
-      if (process.platform === 'win32') {
-        // Keep only command line / deep linked arguments
-        deeplinkingUrl = process.argv.slice(1);
-      }
-      log('desktop:deeplinking').info('Deep Link Url', deeplinkingUrl);
-      mainWindow.webContents.send('wpLogin', deeplinkingUrl);
+      mainWindow.webContents.send('wpLogin', url);
     });
   });
 
@@ -182,6 +175,11 @@ module.exports = function main() {
       mainWindow.focus();
     }
   });
+
+  if (process.platform === 'win32') {
+    // Keep only command line / deep linked arguments
+    mainWindow.webContents.send('wpLogin', process.argv.slice(1));
+  }
 
   if (!gotTheLock) {
     return app.quit();
