@@ -156,8 +156,6 @@ module.exports = function main() {
     mainWindow.once('ready-to-show', mainWindow.show);
   };
 
-  const gotTheLock = app.requestSingleInstanceLock();
-
   app.on('will-finish-launching', function () {
     setTimeout(updater.ping.bind(updater), config.updater.delay);
     app.on('open-url', function (event, url) {
@@ -166,23 +164,28 @@ module.exports = function main() {
     });
   });
 
-  app.on('second-instance', (e, argv) => {
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
+  const gotTheLock = app.requestSingleInstanceLock();
+  if (gotTheLock) {
+    app.on('second-instance', (e, argv) => {
+      // Someone tried to run a second instance, we should focus our window.
+
+      // Protocol handler for win32
+      // argv: An array of the second instance’s (command line / deep linked) arguments
+      if (process.platform !== 'darwin') {
+        // Keep only command line / deep linked arguments
+        mainWindow.webContents.send('wpLogin', argv.slice(1));
       }
-      mainWindow.focus();
-    }
 
-    if (process.platform === 'win32') {
-      // Keep only command line / deep linked arguments
-      mainWindow.webContents.send('wpLogin', argv.slice(1));
-    }
-  });
-
-  if (!gotTheLock) {
-    return app.quit();
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore();
+        }
+        mainWindow.focus();
+      }
+    });
+  } else {
+    app.quit();
+    return;
   }
 
   if (!app.isDefaultProtocolClient('simplenote')) {
