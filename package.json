@@ -125,7 +125,7 @@
     "cookie": "0.4.1",
     "core-js": "3.6.5",
     "date-fns": "2.14.0",
-    "draft-js": "0.11.5",
+    "draft-js": "0.11.7",
     "draft-js-multidecorators": "1.0.0",
     "draft-js-simpledecorator": "1.0.2",
     "electron-fetch": "1.4.0",
